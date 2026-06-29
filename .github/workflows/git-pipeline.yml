@@ -1,0 +1,220 @@
+name: MuleSoft CloudHub 2.0 Deployment
+
+on:
+  workflow_dispatch: #  Allowing manual branch execution
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17 & Maven Cache
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Create settings.xml from Secrets
+        run: |
+          echo "${{ secrets.MAVEN_SETTINGS_XML }}" > settings.xml
+
+      - name: Test Phase
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          mvn clean test -s settings.xml 
+          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
+          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
+          -Dmule.env=${{ vars.MULE_ENV_DEV }} 
+          -Dmule.key=${{ secrets.ENCRYPTION_KEY_DEV }}
+
+      - name: Package Phase
+        run: |
+          mvn clean package -DskipTests -s settings.xml 
+          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
+          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}
+
+      - name: Publish Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: drop
+          path: .
+          include-hidden-files: true
+
+  Deploy_To_Dev:
+    needs: CI
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    environment: DEV
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: drop
+
+      - name: Set up JDK 17 & Maven Cache
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Create settings.xml from Secrets
+        run: |
+          echo "${{ secrets.MAVEN_SETTINGS_XML }}" > settings.xml
+
+      - name: Publish to Exchange
+        run: |
+          mvn deploy -DskipTests -s settings.xml 
+          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
+          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
+          -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }}
+
+      - name: Deploy To Development
+        run: |
+          mvn mule:deploy -DskipTests -s settings.xml 
+          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
+          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
+          -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }} 
+          -Denvironment=${{ vars.ENVIRONMENT_DEV }} 
+          -Dtarget=${{ vars.TARGET_DEV }} 
+          -Dreplicas=${{ vars.REPLICAS_DEV }} 
+          -DvCores=${{ vars.VCORES_DEV }} 
+          -Danypoint.platform.client_id=${{ secrets.CLIENT_ID_DEV }} 
+          -Danypoint.platform.client_secret=${{ secrets.CLIENT_SECRET_DEV }} 
+          -Dmule.env=${{ vars.MULE_ENV_DEV }} 
+          -Dmule.key=${{ secrets.ENCRYPTION_KEY_DEV }}
+
+  Deploy_To_QA:
+    needs: CI
+    if: github.ref == 'refs/heads/qa'
+    runs-on: ubuntu-latest
+    environment: QA
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: drop
+
+      - name: Set up JDK 17 & Maven Cache
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Create settings.xml from Secrets
+        run: |
+          echo "${{ secrets.MAVEN_SETTINGS_XML }}" > settings.xml
+
+      - name: Publish to Exchange
+        run: |
+          mvn deploy -DskipTests -s settings.xml 
+          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
+          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
+          -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }}
+
+      - name: Deploy To QA
+        run: |
+          mvn mule:deploy -DskipTests -s settings.xml 
+          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
+          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
+          -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }} 
+          -Denvironment=${{ vars.ENVIRONMENT_QA }} 
+          -Dtarget=${{ vars.TARGET_QA }} 
+          -Dreplicas=${{ vars.REPLICAS_QA }} 
+          -DvCores=${{ vars.VCORES_QA }} 
+          -Danypoint.platform.client_id=${{ secrets.CLIENT_ID_QA }} 
+          -Danypoint.platform.client_secret=${{ secrets.CLIENT_SECRET_QA }} 
+          -Dmule.env=${{ vars.MULE_ENV_QA }} 
+          -Dmule.key=${{ secrets.ENCRYPTION_KEY_QA }}
+
+  Deploy_To_UAT:
+    needs: CI
+    if: github.ref == 'refs/heads/uat'
+    runs-on: ubuntu-latest
+    environment: UAT
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: drop
+
+      - name: Set up JDK 17 & Maven Cache
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Create settings.xml from Secrets
+        run: |
+          echo "${{ secrets.MAVEN_SETTINGS_XML }}" > settings.xml
+
+      - name: Publish to Exchange
+        run: |
+          mvn deploy -DskipTests -s settings.xml 
+          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
+          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
+          -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }}
+
+      - name: Deploy To UAT
+        run: |
+          mvn mule:deploy -DskipTests -s settings.xml 
+          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
+          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
+          -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }} 
+          -Denvironment=${{ vars.ENVIRONMENT_UAT }} 
+          -Dtarget=${{ vars.TARGET_UAT }} 
+          -Dreplicas=${{ vars.REPLICAS_UAT }} 
+          -DvCores=${{ vars.VCORES_UAT }} 
+          -Danypoint.platform.client_id=${{ secrets.CLIENT_ID_UAT }} 
+          -Danypoint.platform.client_secret=${{ secrets.CLIENT_SECRET_UAT }} 
+          -Dmule.env=${{ vars.MULE_ENV_UAT }} 
+          -Dmule.key=${{ secrets.ENCRYPTION_KEY_UAT }}
+
+  Deploy_To_PROD:
+    needs: CI
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: PROD
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: drop
+
+      - name: Set up JDK 17 & Maven Cache
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Create settings.xml from Secrets
+        run: |
+          echo "${{ secrets.MAVEN_SETTINGS_XML }}" > settings.xml
+
+      - name: Publish to Exchange
+        run: |
+          mvn deploy -DskipTests -s settings.xml 
+          -Danypoint.username=${{ secrets.PROD_ANYPOINT_USERNAME }} 
+          -Danypoint.password=${{ secrets.PROD_ANYPOINT_PASSWORD }} 
+          -DbusinessGroupId=${{ vars.PROD_BUSINESS_GROUP_ID }}
+
+      - name: Deploy To PROD
+        run: |
+          mvn mule:deploy -DskipTests -s settings.xml 
+          -Danypoint.username=${{ secrets.PROD_ANYPOINT_USERNAME }} 
+          -Danypoint.password=${{ secrets.PROD_ANYPOINT_PASSWORD }} 
+          -DbusinessGroupId=${{ vars.PROD_BUSINESS_GROUP_ID }} 
+          -Denvironment=${{ vars.ENVIRONMENT_PROD }} 
+          -Dtarget=${{ vars.TARGET_PROD }} 
+          -Dreplicas=${{ vars.REPLICAS_PROD }} 
+          -DvCores=${{ vars.VCORES_PROD }} 
+          -Danypoint.platform.client_id=${{ secrets.CLIENT_ID_PROD }} 
+          -Danypoint.platform.client_secret=${{ secrets.CLIENT_SECRET_PROD }} 
+          -Dmule.env=${{ vars.MULE_ENV_PROD }} 
+          -Dmule.key=${{ secrets.ENCRYPTION_KEY_PROD }}
