@@ -28,7 +28,7 @@ jobs:
           -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
           -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
           -Dmule.env=${{ vars.MULE_ENV_DEV }} 
-          -Dmule.key=${{ secrets.ENCRYPTION_KEY_DEV }}
+ #        -Dmule.key=${{ secrets.ENCRYPTION_KEY_DEV }}
 
       - name: Package Phase
         run: |
@@ -85,7 +85,7 @@ jobs:
           -Danypoint.platform.client_id=${{ secrets.CLIENT_ID_DEV }} 
           -Danypoint.platform.client_secret=${{ secrets.CLIENT_SECRET_DEV }} 
           -Dmule.env=${{ vars.MULE_ENV_DEV }} 
-          -Dmule.key=${{ secrets.ENCRYPTION_KEY_DEV }}
+ #         -Dmule.key=${{ secrets.ENCRYPTION_KEY_DEV }}
 
   Deploy_To_QA:
     needs: CI
