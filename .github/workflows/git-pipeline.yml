@@ -19,7 +19,7 @@ jobs:
 
       - name: Test Phase
         if: github.ref == 'refs/heads/develop'
-        run:  mvn clean test -s .maven/settings.xml -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}-Dmule.env=${{ vars.MULE_ENV_DEV }} 
+        run:  mvn clean test -s .maven/settings.xml -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} -Dmule.env=${{ vars.MULE_ENV_DEV }} 
  #        -Dmule.key=${{ secrets.ENCRYPTION_KEY_DEV }}
 
       - name: Package Phase
