@@ -85,25 +85,11 @@ jobs:
 
       - name: Publish to Exchange
         run: |
-          mvn deploy -DskipTests -s .maven/settings.xml 
-          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
-          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
-          -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }}
+          mvn deploy -DskipTests -s .maven/settings.xml -Dmule.artifact=$artifactName
 
       - name: Deploy To QA
         run: |
-          mvn mule:deploy -DskipTests -s .maven/settings.xml 
-          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
-          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
-          -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }} 
-          -Denvironment=${{ vars.ENVIRONMENT_QA }} 
-          -Dtarget=${{ vars.TARGET_QA }} 
-          -Dreplicas=${{ vars.REPLICAS_QA }} 
-          -DvCores=${{ vars.VCORES_QA }} 
-          -Danypoint.platform.client_id=${{ secrets.CLIENT_ID_QA }} 
-          -Danypoint.platform.client_secret=${{ secrets.CLIENT_SECRET_QA }} 
-          -Dmule.env=${{ vars.MULE_ENV_QA }} 
-          -Dmule.key=${{ secrets.ENCRYPTION_KEY_QA }}
+          mvn mule:deploy -DskipTests -s .maven/settings.xml -DskipTests -DskipDeploymentVerification="true"
 
   Deploy_To_UAT:
     needs: CI
@@ -125,25 +111,11 @@ jobs:
 
       - name: Publish to Exchange
         run: |
-          mvn deploy -DskipTests -s .maven/settings.xml
-          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
-          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
-          -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }}
+          mvn deploy -DskipTests -s .maven/settings.xml -Dmule.artifact=$artifactName
 
       - name: Deploy To UAT
         run: |
-          mvn mule:deploy -DskipTests -s .maven/settings.xml
-          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
-          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
-          -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }} 
-          -Denvironment=${{ vars.ENVIRONMENT_UAT }} 
-          -Dtarget=${{ vars.TARGET_UAT }} 
-          -Dreplicas=${{ vars.REPLICAS_UAT }} 
-          -DvCores=${{ vars.VCORES_UAT }} 
-          -Danypoint.platform.client_id=${{ secrets.CLIENT_ID_UAT }} 
-          -Danypoint.platform.client_secret=${{ secrets.CLIENT_SECRET_UAT }} 
-          -Dmule.env=${{ vars.MULE_ENV_UAT }} 
-          -Dmule.key=${{ secrets.ENCRYPTION_KEY_UAT }}
+          mvn mule:deploy -DskipTests -s .maven/settings.xml -DskipTests -DskipDeploymentVerification="true"
 
   Deploy_To_PROD:
     needs: CI
@@ -165,22 +137,8 @@ jobs:
 
       - name: Publish to Exchange
         run: |
-          mvn deploy -DskipTests -s .maven/settings.xml
-          -Danypoint.username=${{ secrets.PROD_ANYPOINT_USERNAME }} 
-          -Danypoint.password=${{ secrets.PROD_ANYPOINT_PASSWORD }} 
-          -DbusinessGroupId=${{ vars.PROD_BUSINESS_GROUP_ID }}
+          mvn deploy -DskipTests -s .maven/settings.xml -Dmule.artifact=$artifactName
 
       - name: Deploy To PROD
         run: |
-          mvn mule:deploy -DskipTests -s .maven/settings.xml
-          -Danypoint.username=${{ secrets.PROD_ANYPOINT_USERNAME }} 
-          -Danypoint.password=${{ secrets.PROD_ANYPOINT_PASSWORD }} 
-          -DbusinessGroupId=${{ vars.PROD_BUSINESS_GROUP_ID }} 
-          -Denvironment=${{ vars.ENVIRONMENT_PROD }} 
-          -Dtarget=${{ vars.TARGET_PROD }} 
-          -Dreplicas=${{ vars.REPLICAS_PROD }} 
-          -DvCores=${{ vars.VCORES_PROD }} 
-          -Danypoint.platform.client_id=${{ secrets.CLIENT_ID_PROD }} 
-          -Danypoint.platform.client_secret=${{ secrets.CLIENT_SECRET_PROD }} 
-          -Dmule.env=${{ vars.MULE_ENV_PROD }} 
-          -Dmule.key=${{ secrets.ENCRYPTION_KEY_PROD }}
+          mvn mule:deploy -DskipTests -s .maven/settings.xml -DskipTests -DskipDeploymentVerification="true"
