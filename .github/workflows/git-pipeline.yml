@@ -18,23 +18,15 @@ jobs:
           cache: 'maven'
 
       - name: Create settings.xml from Secrets
-        run: |
-          echo "${{ secrets.MAVEN_SETTINGS_XML }}" > settings.xml
+        run: | cat <<'SETTINGS' > settings.xml ${{ secrets.MAVEN_SETTINGS_XML }} SETTINGS
 
       - name: Test Phase
         if: github.ref == 'refs/heads/develop'
-        run: |
-          mvn clean test -s settings.xml 
-          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
-          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
-          -Dmule.env=${{ vars.MULE_ENV_DEV }} 
+        run:  mvn clean test -s settings.xml -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}-Dmule.env=${{ vars.MULE_ENV_DEV }} 
  #        -Dmule.key=${{ secrets.ENCRYPTION_KEY_DEV }}
 
       - name: Package Phase
-        run: |
-          mvn clean package -DskipTests -s settings.xml 
-          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
-          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}
+        run:  mvn clean package -DskipTests -s settings.xml -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}
 
       - name: Publish Build Artifacts
         uses: actions/upload-artifact@v4
@@ -106,8 +98,7 @@ jobs:
           cache: 'maven'
 
       - name: Create settings.xml from Secrets
-        run: |
-          echo "${{ secrets.MAVEN_SETTINGS_XML }}" > settings.xml
+        run: | cat <<'SETTINGS' > settings.xml ${{ secrets.MAVEN_SETTINGS_XML }} SETTINGS
 
       - name: Publish to Exchange
         run: |
