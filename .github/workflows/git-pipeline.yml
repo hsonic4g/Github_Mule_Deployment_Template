@@ -17,16 +17,13 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Create settings.xml from Secrets
-        run: | cat <<'SETTINGS' > settings.xml ${{ secrets.MAVEN_SETTINGS_XML }} SETTINGS
-
       - name: Test Phase
         if: github.ref == 'refs/heads/develop'
-        run:  mvn clean test -s settings.xml -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}-Dmule.env=${{ vars.MULE_ENV_DEV }} 
+        run:  mvn clean test -s .maven/settings.xml -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}-Dmule.env=${{ vars.MULE_ENV_DEV }} 
  #        -Dmule.key=${{ secrets.ENCRYPTION_KEY_DEV }}
 
       - name: Package Phase
-        run:  mvn clean package -DskipTests -s settings.xml -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}
+        run:  mvn clean package -DskipTests -s .maven/settings.xml -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}
 
       - name: Publish Build Artifacts
         uses: actions/upload-artifact@v4
@@ -53,20 +50,16 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Create settings.xml from Secrets
-        run: |
-          echo "${{ secrets.MAVEN_SETTINGS_XML }}" > settings.xml
-
       - name: Publish to Exchange
         run: |
-          mvn deploy -DskipTests -s settings.xml 
+          mvn deploy -DskipTests -s .maven/settings.xml 
           -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
           -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
           -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }}
 
       - name: Deploy To Development
         run: |
-          mvn mule:deploy -DskipTests -s settings.xml 
+          mvn mule:deploy -DskipTests -s .maven/settings.xml 
           -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
           -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
           -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }} 
@@ -97,19 +90,16 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Create settings.xml from Secrets
-        run: | cat <<'SETTINGS' > settings.xml ${{ secrets.MAVEN_SETTINGS_XML }} SETTINGS
-
       - name: Publish to Exchange
         run: |
-          mvn deploy -DskipTests -s settings.xml 
+          mvn deploy -DskipTests -s .maven/settings.xml 
           -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
           -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
           -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }}
 
       - name: Deploy To QA
         run: |
-          mvn mule:deploy -DskipTests -s settings.xml 
+          mvn mule:deploy -DskipTests -s .maven/settings.xml 
           -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
           -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
           -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }} 
@@ -140,20 +130,16 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Create settings.xml from Secrets
-        run: |
-          echo "${{ secrets.MAVEN_SETTINGS_XML }}" > settings.xml
-
       - name: Publish to Exchange
         run: |
-          mvn deploy -DskipTests -s settings.xml 
+          mvn deploy -DskipTests -s .maven/settings.xml
           -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
           -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
           -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }}
 
       - name: Deploy To UAT
         run: |
-          mvn mule:deploy -DskipTests -s settings.xml 
+          mvn mule:deploy -DskipTests -s .maven/settings.xml
           -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
           -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
           -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }} 
@@ -184,20 +170,16 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Create settings.xml from Secrets
-        run: |
-          echo "${{ secrets.MAVEN_SETTINGS_XML }}" > settings.xml
-
       - name: Publish to Exchange
         run: |
-          mvn deploy -DskipTests -s settings.xml 
+          mvn deploy -DskipTests -s .maven/settings.xml
           -Danypoint.username=${{ secrets.PROD_ANYPOINT_USERNAME }} 
           -Danypoint.password=${{ secrets.PROD_ANYPOINT_PASSWORD }} 
           -DbusinessGroupId=${{ vars.PROD_BUSINESS_GROUP_ID }}
 
       - name: Deploy To PROD
         run: |
-          mvn mule:deploy -DskipTests -s settings.xml 
+          mvn mule:deploy -DskipTests -s .maven/settings.xml
           -Danypoint.username=${{ secrets.PROD_ANYPOINT_USERNAME }} 
           -Danypoint.password=${{ secrets.PROD_ANYPOINT_PASSWORD }} 
           -DbusinessGroupId=${{ vars.PROD_BUSINESS_GROUP_ID }} 
