@@ -6,6 +6,9 @@ on:
 jobs:
   CI:
     runs-on: ubuntu-latest
+    env:
+      CA_CLIENT_ID: ${{ secrets.CA_CLIENT_ID }}
+      CA_CLIENT_SECRET: ${{ secrets.CA_CLIENT_SECRET }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -36,6 +39,9 @@ jobs:
     needs: CI
     if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
+    env:
+      CA_CLIENT_ID: ${{ secrets.CA_CLIENT_ID }}
+      CA_CLIENT_SECRET: ${{ secrets.CA_CLIENT_SECRET }}
     environment: DEV
     steps:
       - name: Download Build Artifacts
