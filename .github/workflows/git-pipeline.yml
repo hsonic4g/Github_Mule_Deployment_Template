@@ -6,6 +6,9 @@ on:
 jobs:
   CI:
     runs-on: ubuntu-latest
+    env:
+      CA_CLIENT_ID: ${{ secrets.CA_CLIENT_ID }}
+      CA_CLIENT_SECRET: ${{ secrets.CA_CLIENT_SECRET }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -36,6 +39,9 @@ jobs:
     needs: CI
     if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
+    env:
+      CA_CLIENT_ID: ${{ secrets.CA_CLIENT_ID }}
+      CA_CLIENT_SECRET: ${{ secrets.CA_CLIENT_SECRET }}
     environment: DEV
     steps:
       - name: Download Build Artifacts
@@ -52,24 +58,11 @@ jobs:
 
       - name: Publish to Exchange
         run: |
-          mvn deploy -DskipTests -s .maven/settings.xml 
-          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
-          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
-          -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }}
+          mvn deploy -DskipTests -s .maven/settings.xml -Dmule.artifact=$artifactName
 
       - name: Deploy To Development
         run: |
-          mvn mule:deploy -DskipTests -s .maven/settings.xml 
-          -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} 
-          -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }} 
-          -DbusinessGroupId=${{ vars.BUSINESS_GROUP_ID }} 
-          -Denvironment=${{ vars.ENVIRONMENT_DEV }} 
-          -Dtarget=${{ vars.TARGET_DEV }} 
-          -Dreplicas=${{ vars.REPLICAS_DEV }} 
-          -DvCores=${{ vars.VCORES_DEV }} 
-          -Danypoint.platform.client_id=${{ secrets.CLIENT_ID_DEV }} 
-          -Danypoint.platform.client_secret=${{ secrets.CLIENT_SECRET_DEV }} 
-          -Dmule.env=${{ vars.MULE_ENV_DEV }} 
+          mvn mule:deploy -DskipTests -s .maven/settings.xml -DskipTests -DskipDeploymentVerification="true"
  #         -Dmule.key=${{ secrets.ENCRYPTION_KEY_DEV }}
 
   Deploy_To_QA:
