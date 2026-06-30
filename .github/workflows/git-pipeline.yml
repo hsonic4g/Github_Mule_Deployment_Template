@@ -57,10 +57,13 @@ jobs:
           cache: 'maven'
 
       - name: Publish to Exchange
-        run: |   muleDeployableJar=$(ls *.jar | head -1)
-            mvn deploy -DskipTests -s .maven/settings.xml /
-            -Dmule.artifact=$muleDeployableJar
+        run: |
+          muleDeployableJar=$(ls *.jar | head -1)
 
+          mvn deploy \
+          -DskipTests \
+          -s .maven/settings.xml \
+          -Dmule.artifact="$muleDeployableJar"
 
       - name: Deploy To Development
         run: |
