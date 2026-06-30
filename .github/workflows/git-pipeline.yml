@@ -31,7 +31,7 @@ jobs:
       - name: Publish Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: drop
+          name: artifact
           path: .
           include-hidden-files: true
 
@@ -47,7 +47,7 @@ jobs:
       - name: Download Build Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: drop
+          name: artifact
 
       - name: Set up JDK 17 & Maven Cache
         uses: actions/setup-java@v4
@@ -58,7 +58,12 @@ jobs:
 
       - name: Publish to Exchange
         run: |
-          mvn deploy -DskipTests -s .maven/settings.xml -Dmule.artifact=$artifactName
+          muleDeployableJar=$(ls *.jar | head -1)
+
+          mvn deploy \
+          -DskipTests \
+          -s .maven/settings.xml \
+          -Dmule.artifact="$muleDeployableJar"
 
       - name: Deploy To Development
         run: |
