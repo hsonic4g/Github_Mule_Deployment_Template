@@ -32,7 +32,7 @@ jobs:
  #        -Dmule.key=${{ secrets.ENCRYPTION_KEY_DEV }}
 
       - name: Package Phase
-        run:  mvn clean package -DskipTests -s .maven/settings.xml -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}
+        run:  mvn -B -U -e -X clean package -DskipTests -s .maven/settings.xml -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}
 
       - name: Stamp artifact file name with commit hash
         run: |
@@ -87,7 +87,7 @@ jobs:
 
       - name: Deploy To Development
         run: |
-          mvn mule:deploy  -DskipTests -s .maven/settings.xml -Dmule.version=$MULE_VERSION\
+          mvn -e -X mule:deploy  -DskipTests -s .maven/settings.xml -Dmule.version=$MULE_VERSION\
             -Dmule.env=$MULE.ENV\
             -Danypoint.businessGroupId=$BUSINESS_GROUP_ID -Dprovider=$PROVIDER\
             -Dcloudhub.env=$CLOUDHUBENV -Dcloudhub.workerType=MICRO\
