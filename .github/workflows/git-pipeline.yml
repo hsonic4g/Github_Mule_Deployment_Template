@@ -62,6 +62,7 @@ jobs:
       CLOUDHUB_REGION: ${{vars.TARGET}}
       PROVIDER: ${{vars.PROVIDER}}
       REPLICAS: ${{vars.REPLICAS}}
+      MULE_ENV: ${{ vars.MULE_ENV}}
     
     steps:
       - name: Download Build Artifacts
