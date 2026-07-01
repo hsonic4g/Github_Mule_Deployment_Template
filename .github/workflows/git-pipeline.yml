@@ -57,7 +57,7 @@ jobs:
       CA_CLIENT_ID: ${{ secrets.CA_CLIENT_ID }}
       CA_CLIENT_SECRET: ${{ secrets.CA_CLIENT_SECRET }}
       BUSINESS_GROUP_ID: ${{ secrets.BUSINESS_GROUP_ID }}
-      MULEENV: ${{ vars.MULE_ENV }}
+      MULE_VERSION: ${{ vars.MULEVERSION }}
       CLOUDHUBENV: ${{vars.CLOUDHUB_ENV}}
       CLOUDHUB_REGION: ${{vars.TARGET}}
       PROVIDER: ${{vars.PROVIDER}}
@@ -87,10 +87,9 @@ jobs:
 
       - name: Deploy To Development
         run: |
-          mvn mule:deploy -DskipTests -s .maven/settings.xml -DskipTests -DskipDeploymentVerification="true"
-          mvn mule:deploy  -DskipTests -Dmule.version=$MULEVERSION\
+          mvn mule:deploy  -DskipTests -Dmule.version=$MULE_VERSION\
             -Danypoint.businessGroupId=$BUSINESS_GROUP_ID -Dprovider=$PROVIDER\
-            -Dcloudhub.env=$CLOUDHUB_ENV -Dcoudhub.workerType=MICRO\
+            -Dcloudhub.env=$CLOUDHUBENV -Dcloudhub.workerType=MICRO\
             -Dcloudhub.region=$CLOUDHUB_REGION -Dreplicas=$REPLICAS\
             -DconnectedApp_clientId=$CA_CLIENT_ID\
             -DconnectedApp_clientSecret=$CA_CLIENT_SECRET
