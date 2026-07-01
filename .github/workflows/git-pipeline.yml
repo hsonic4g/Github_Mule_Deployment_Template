@@ -58,7 +58,7 @@ jobs:
       CA_CLIENT_SECRET: ${{ secrets.CA_CLIENT_SECRET }}
       BUSINESS_GROUP_ID: ${{ vars.BUSINESS_GROUP_ID }}
       MULE_VERSION: ${{ vars.MULEVERSION }}
-      CLOUDHUBENV: ${{vars.CLOUDHUB_ENV}}
+      CLOUDHUB_ENV: ${{vars.CLOUDHUB_ENV}}
       CLOUDHUB_REGION: ${{vars.TARGET}}
       PROVIDER: ${{vars.PROVIDER}}
       REPLICAS: ${{vars.REPLICAS}}
@@ -90,7 +90,7 @@ jobs:
           mvn -e -X mule:deploy  -DskipTests -s .maven/settings.xml -Dmule.version=$MULE_VERSION\
             -Dmule.env=$MULE.ENV\
             -Danypoint.businessGroupId=$BUSINESS_GROUP_ID -Dprovider=$PROVIDER\
-            -Dcloudhub.env=$CLOUDHUBENV -Dcloudhub.workerType=MICRO\
+            -Dcloudhub.env=$CLOUDHUB_ENV -Dcloudhub.workerType=MICRO\
             -Dcloudhub.region=$CLOUDHUB_REGION -Dreplicas=$REPLICAS\
             -DconnectedApp_clientId=$CA_CLIENT_ID\
             -DconnectedApp_clientSecret=$CA_CLIENT_SECRET
