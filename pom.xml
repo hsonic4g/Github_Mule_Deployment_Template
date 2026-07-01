@@ -4,7 +4,7 @@
 
 	<groupId>ac5a08a7-ddeb-4d9e-a7a2-a62f8d9306db</groupId>
 	<artifactId>sample-project</artifactId>
-	<version>1.0.8</version>
+	<version>1.0.9</version>
 	<packaging>mule-application</packaging>
 
 	<name>sample-project</name>
@@ -37,7 +37,7 @@
 		<target>${CLOUDHUB_REGION}</target>
 		<muleVersion>${app.runtime}</muleVersion>
 		<server>anypoint-exchange-v3</server>
-		<applicationName>${mule.env}-${project.artifactId}-${version}</applicationName>
+		<applicationName>${mule.env}-${project.artifactId}-${project.version}</applicationName>
 		<replicas>${REPLICAS}</replicas>
 		<vCores>0.1</vCores>
 		<skipDeploymentVerification>${skipDeploymentVerification}</skipDeploymentVerification>
