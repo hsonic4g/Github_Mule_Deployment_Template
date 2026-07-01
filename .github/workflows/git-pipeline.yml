@@ -62,7 +62,7 @@ jobs:
       CLOUDHUB_REGION: ${{vars.TARGET}}
       PROVIDER: ${{vars.PROVIDER}}
       REPLICAS: ${{vars.REPLICAS}}
-      MULE_ENV: ${{ vars.MULE_ENV}}
+      MULE.ENV: ${{ vars.MULE_ENV}}
     
     steps:
       - name: Download Build Artifacts
@@ -88,7 +88,7 @@ jobs:
       - name: Deploy To Development
         run: |
           mvn mule:deploy  -DskipTests -s .maven/settings.xml -Dmule.version=$MULE_VERSION\
-            -Dmule.artifact="$muleDeployableJar" \
+            -Dmule.env=$MULE.ENV\
             -Danypoint.businessGroupId=$BUSINESS_GROUP_ID -Dprovider=$PROVIDER\
             -Dcloudhub.env=$CLOUDHUBENV -Dcloudhub.workerType=MICRO\
             -Dcloudhub.region=$CLOUDHUB_REGION -Dreplicas=$REPLICAS\
