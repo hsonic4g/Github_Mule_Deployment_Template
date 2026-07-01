@@ -82,7 +82,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'maven'
 
       - name: Publish to Exchange
         run: |
@@ -96,6 +95,7 @@ jobs:
       - name: Deploy To Development
         run: |
           mvn mule:deploy  -DskipTests -s .maven/settings.xml -Dmule.version=$MULE_VERSION\
+            -Dmule.artifact="$muleDeployableJar" \
             -Danypoint.businessGroupId=$BUSINESS_GROUP_ID -Dprovider=$PROVIDER\
             -Dcloudhub.env=$CLOUDHUBENV -Dcloudhub.workerType=MICRO\
             -Dcloudhub.region=$CLOUDHUB_REGION -Dreplicas=$REPLICAS\
