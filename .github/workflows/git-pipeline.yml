@@ -56,7 +56,7 @@ jobs:
     env:
       CA_CLIENT_ID: ${{ secrets.CA_CLIENT_ID }}
       CA_CLIENT_SECRET: ${{ secrets.CA_CLIENT_SECRET }}
-      BUSINESS_GROUP_ID: ${{ secrets.BUSINESS_GROUP_ID }}
+      BUSINESS_GROUP_ID: ${{ vars.BUSINESS_GROUP_ID }}
       MULE_VERSION: ${{ vars.MULEVERSION }}
       CLOUDHUBENV: ${{vars.CLOUDHUB_ENV}}
       CLOUDHUB_REGION: ${{vars.TARGET}}
