@@ -68,7 +68,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: artifact
-
+          
+      - uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+            
       - name: Set up JDK 17 & Maven Cache
         uses: actions/setup-java@v4
         with:
@@ -87,7 +94,7 @@ jobs:
 
       - name: Deploy To Development
         run: |
-          mvn mule:deploy  -DskipTests -Dmule.version=$MULE_VERSION\
+          mvn mule:deploy  -DskipTests -s .maven/settings.xml -Dmule.version=$MULE_VERSION\
             -Danypoint.businessGroupId=$BUSINESS_GROUP_ID -Dprovider=$PROVIDER\
             -Dcloudhub.env=$CLOUDHUBENV -Dcloudhub.workerType=MICRO\
             -Dcloudhub.region=$CLOUDHUB_REGION -Dreplicas=$REPLICAS\
