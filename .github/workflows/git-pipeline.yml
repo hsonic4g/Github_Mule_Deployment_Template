@@ -32,7 +32,7 @@ jobs:
  #        -Dmule.key=${{ secrets.ENCRYPTION_KEY_DEV }}
 
       - name: Package Phase
-        run:  mvn clean package -DskipTests -s .maven/settings.xml -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}
+        run:  mvn -B -U -e -X clean package -DskipTests -s .maven/settings.xml -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}
 
       - name: Stamp artifact file name with commit hash
         run: |
@@ -56,9 +56,9 @@ jobs:
     env:
       CA_CLIENT_ID: ${{ secrets.CA_CLIENT_ID }}
       CA_CLIENT_SECRET: ${{ secrets.CA_CLIENT_SECRET }}
-      BUSINESS_GROUP_ID: ${{ secrets.BUSINESS_GROUP_ID }}
+      BUSINESS_GROUP_ID: ${{ vars.BUSINESS_GROUP_ID }}
       MULE_VERSION: ${{ vars.MULEVERSION }}
-      CLOUDHUBENV: ${{vars.CLOUDHUB_ENV}}
+      CLOUDHUB_ENV: ${{vars.CLOUDHUB_ENV}}
       CLOUDHUB_REGION: ${{vars.TARGET}}
       PROVIDER: ${{vars.PROVIDER}}
       REPLICAS: ${{vars.REPLICAS}}
@@ -87,10 +87,10 @@ jobs:
 
       - name: Deploy To Development
         run: |
-          mvn mule:deploy  -DskipTests -s .maven/settings.xml -Dmule.version=$MULE_VERSION\
+          mvn -e -X mule:deploy  -DskipTests -s .maven/settings.xml -Dmule.version=$MULE_VERSION\
             -Dmule.env=$MULE.ENV\
             -Danypoint.businessGroupId=$BUSINESS_GROUP_ID -Dprovider=$PROVIDER\
-            -Dcloudhub.env=$CLOUDHUBENV -Dcloudhub.workerType=MICRO\
+            -Dcloudhub.env=$CLOUDHUB_ENV -Dcloudhub.workerType=MICRO\
             -Dcloudhub.region=$CLOUDHUB_REGION -Dreplicas=$REPLICAS\
             -DconnectedApp_clientId=$CA_CLIENT_ID\
             -DconnectedApp_clientSecret=$CA_CLIENT_SECRET
