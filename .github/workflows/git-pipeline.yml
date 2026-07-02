@@ -89,7 +89,7 @@ jobs:
           mvn -e -X mule:deploy  -DskipTests -s .maven/settings.xml -Dmule.version=$MULE_VERSION\
             -Dmule.env=$MULE.ENV\
             -Danypoint.businessGroupId=$BUSINESS_GROUP_ID -Dprovider=$PROVIDER\
-            -Dcloudhub.env=$CLOUDHUB_ENV -Dcloudhub.workerType=MICRO\
+            -Dcloudhub.env=$CLOUDHUB_ENV -Dcloudhub.vcores=0.1\
             -Dcloudhub.region=$CLOUDHUB_REGION -Dreplicas=$REPLICAS\
             -DconnectedApp_clientId=$CA_CLIENT_ID\
             -DconnectedApp_clientSecret=$CA_CLIENT_SECRET
