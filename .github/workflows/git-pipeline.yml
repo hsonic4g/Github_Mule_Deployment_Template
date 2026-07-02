@@ -29,10 +29,9 @@ jobs:
       - name: Test Phase
         if: github.ref == 'refs/heads/develop'
         run:  mvn clean test -s .maven/settings.xml -Dmule.env=${{ vars.MULE_ENV_DEV }} 
- #        -Dmule.key=${{ secrets.ENCRYPTION_KEY_DEV }}
 
       - name: Package Phase
-        run:  mvn -B -U -e -X clean package -DskipTests -s .maven/settings.xml -Danypoint.username=${{ secrets.ANYPOINT_USERNAME }} -Danypoint.password=${{ secrets.ANYPOINT_PASSWORD }}
+        run:  mvn clean package -DskipTests -s .maven/settings.xml 
 
       - name: Stamp artifact file name with commit hash
         run: |
@@ -94,7 +93,6 @@ jobs:
             -Dcloudhub.region=$CLOUDHUB_REGION -Dreplicas=$REPLICAS\
             -DconnectedApp_clientId=$CA_CLIENT_ID\
             -DconnectedApp_clientSecret=$CA_CLIENT_SECRET
-
 
 
   Deploy_To_QA:
