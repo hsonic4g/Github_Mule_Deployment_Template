@@ -52,6 +52,7 @@ jobs:
             pom.xml
             src
             .maven/settings.xml
+            mule-artifact.json
             target/*.jar
           include-hidden-files: true
 
