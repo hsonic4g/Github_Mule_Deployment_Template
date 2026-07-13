@@ -51,7 +51,7 @@ jobs:
           path: |
             pom.xml
             .maven/
-            target/app.jar
+            target/*.jar
           include-hidden-files: true
 
   Deploy_To_Dev:
