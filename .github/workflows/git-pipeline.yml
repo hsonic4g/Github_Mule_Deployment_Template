@@ -3,6 +3,10 @@ name: MuleSoft CloudHub 2.0 Deployment
 on:
   workflow_dispatch: #  Allowing manual branch execution
 
+env:
+  APP_VERSION: '1.0.${{ github.run_number }}'   # unique GAV per run
+                                                # (pom version = ${revision})
+                                                
 jobs:
   CI:
     runs-on: ubuntu-latest
@@ -28,10 +32,10 @@ jobs:
 
       - name: Test Phase
         if: github.ref == 'refs/heads/develop'
-        run:  mvn clean test -s .maven/settings.xml -Dmule.env=${{ vars.MULE_ENV_DEV }} 
+        run:  mvn clean test -s .maven/settings.xml -Drevision=$APP_VERSION -Dmule.env=${{ vars.MULE_ENV_DEV }} 
 
       - name: Package Phase
-        run:  mvn clean package -DskipTests -s .maven/settings.xml 
+        run:  mvn clean package -DskipTests -s .maven/settings.xml -Drevision=$APP_VERSION
 
       - name: Stamp artifact file name with commit hash
         run: |
@@ -44,7 +48,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifact
-          path: .
+          path: |
+            pom.xml
+            .maven/
+            target/app.jar
           include-hidden-files: true
 
   Deploy_To_Dev:
@@ -82,17 +89,24 @@ jobs:
           mvn deploy \
           -DskipTests \
           -s .maven/settings.xml \
+          -Drevision=$APP_VERSION \
           -Dmule.artifact="$muleDeployableJar"
 
       - name: Deploy To Development
         run: |
           mvn -e -X mule:deploy  -DskipTests -s .maven/settings.xml -Dmule.version=$MULE_VERSION\
             -Dmule.env=$MULE.ENV\
-            -Danypoint.businessGroupId=$BUSINESS_GROUP_ID -Dprovider=$PROVIDER\
-            -Dcloudhub.env=$CLOUDHUB_ENV -Dcloudhub.vcores=0.1\
-            -Dcloudhub.region=$CLOUDHUB_REGION -Dreplicas=$REPLICAS\
-            -DconnectedApp_clientId=$CA_CLIENT_ID\
-            -DconnectedApp_clientSecret=$CA_CLIENT_SECRET
+            -Drevision=$APP_VERSION \
+            -Danypoint.businessGroupId=$BUSINESS_GROUP_ID \
+            -Dprovider=$PROVIDER\
+            -Dcloudhub.env=$CLOUDHUB_ENV \
+            -Dcloudhub.vcores=0.1\
+            -Dcloudhub.region=$CLOUDHUB_REGION \
+            -Dreplicas=$REPLICAS\
+            -Danypoint.platform.client_id=$CA_CLIENT_ID\
+            -Danypoint.platform.client_secret=$CA_CLIENT_SECRET 
+        # -DconnectedApp_clientId=$CA_CLIENT_ID\
+        # -DconnectedApp_clientSecret=$CA_CLIENT_SECRET
 
 
   Deploy_To_QA:
