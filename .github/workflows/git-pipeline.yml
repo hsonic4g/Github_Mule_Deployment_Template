@@ -50,6 +50,7 @@ jobs:
           name: artifact
           path: |
             pom.xml
+            src
             .maven/settings.xml
             target/*.jar
           include-hidden-files: true
