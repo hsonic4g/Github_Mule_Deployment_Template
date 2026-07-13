@@ -4,7 +4,7 @@
 
 	<groupId>ac5a08a7-ddeb-4d9e-a7a2-a62f8d9306db</groupId>
 	<artifactId>sample-project</artifactId>
-	<version>1.0.14</version>
+	<version>${revision}</version>
 	<packaging>mule-application</packaging>
 
 	<name>sample-project</name>
@@ -30,38 +30,53 @@
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
-	<cloudhub2Deployment>
-		<uri>https://anypoint.mulesoft.com</uri>
-		<provider>${PROVIDER}</provider>
-		<environment>${CLOUDHUB_ENV}</environment>
-		<target>${CLOUDHUB_REGION}</target>
-		<muleVersion>${app.runtime}</muleVersion>
-		<server>anypoint-exchange-v3</server>
-		<applicationName>dev-${project.artifactId}</applicationName>
-		<replicas>${REPLICAS}</replicas>
-		<vCores>${VCORES}</vCores>
-		<skipDeploymentVerification>${skipDeploymentVerification}</skipDeploymentVerification>
-		<integrations>
-			<services>
-				<objectStoreV2>
-					<enabled>true</enabled>
-				</objectStoreV2>
-			</services>
-		</integrations>
-	</cloudhub2Deployment>
-</configuration>
+					<cloudhub2Deployment>
+						<uri>https://anypoint.mulesoft.com</uri>
+						<provider>${PROVIDER}</provider>
+						<environment>${CLOUDHUB_ENV}</environment>
+						<target>${CLOUDHUB_REGION)</target>
+						<muleVersion>${app.runtime}</muleVersion>
+						<server>anypoint-exchange-v3</server>
+						<applicationName>cicd-demo-project-v1</applicationName>
+						<replicas>${REPLICAS}</replicas>
+						<vCores>0.1</vCores>
+						<skipDeploymentVerification>${skipDeploymentVerification}</skipDeploymentVerification>
+						<integrations>
+							<services>
+								<objectStoreV2>
+									<enabled>true</enabled>
+								</objectStoreV2>
+							</services>
+						</integrations>
+						<properties>
+							<mule.env>${mule.env}</mule.env>
+							<anypoint.platform.config.analytics.agent.enabled>true</anypoint.platform.config.analytics.agent.enabled>
+						</properties>
+						<secureProperties>
+							<anypoint.platform.client_id>${anypoint.platform.client_id}</anypoint.platform.client_id>
+							<anypoint.platform.client_secret>${anypoint.platform.client_secret}</anypoint.platform.client_secret>            
+						</secureProperties>
+
+					</cloudhub2Deployment>
+					<sharedLibraries>
+						<sharedLibrary>
+							<groupId>com.microsoft.sqlserver</groupId>
+							<artifactId>mssql-jdbc</artifactId>
+						</sharedLibrary>
+					</sharedLibraries>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
 
-<distributionManagement>
-	<repository>
-		<id>anypoint-exchange-v3</id>
-		<name>Corporate Repository</name>
-		<url>https://maven.anypoint.mulesoft.com/api/v3/organizations/${project.groupId}/maven</url>
-		<layout>default</layout>
-	</repository>
-</distributionManagement>
+	<distributionManagement>
+		<repository>
+			<id>anypoint-exchange-v3</id>
+			<name>Corporate Repository</name>
+			<url>https://maven.anypoint.mulesoft.com/api/v3/organizations/${project.groupId}/maven</url>
+			<layout>default</layout>
+		</repository>
+	</distributionManagement>
 
 	<dependencies>
 		<dependency>
@@ -81,6 +96,17 @@
 			<artifactId>mule-apikit-module</artifactId>
 			<version>1.11.12</version>
 			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-db-connector</artifactId>
+			<version>1.16.0</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>7.0.0.jre8</version>
 		</dependency>
 	</dependencies>
 
