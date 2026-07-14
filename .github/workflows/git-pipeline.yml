@@ -1,4 +1,4 @@
-name: MuleSoft CloudHub 2.0 Deployment
+name: MuleSoft CH2.0 Deployment main pipeline
 
 on:
   workflow_dispatch: #  Allowing manual branch execution
@@ -43,148 +43,60 @@ jobs:
           commitHash=$(git rev-parse --short "$GITHUB_SHA")
           artifactName2=$(ls target/*.jar | head -1 | sed "s/.jar/-$commitHash.jar/g")
           mv $artifactName1 $artifactName2
-          
+
+      - name: Normalize artifact name
+        run: mv "$(ls target/*.jar | head -1)" target/app.jar
+
+      - name: Publish to Exchange
+        run: |
+
+          mvn deploy \
+          -DskipTests \
+          -s .maven/settings.xml \
+          -Drevision=$APP_VERSION \
+          -Dmule.artifact=target/app.jar 
+
       - name: Publish Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: artifact
           path: |
             pom.xml
-            src
-            .maven/settings.xml
-            mule-artifact.json
-            target/*.jar
+            .maven/
+            target/app.jar
           include-hidden-files: true
 
   Deploy_To_Dev:
     needs: CI
     if: github.ref == 'refs/heads/develop'
-    runs-on: ubuntu-latest
-    environment: DEV
-    env:
-      CA_CLIENT_ID: ${{ secrets.CA_CLIENT_ID }}
-      CA_CLIENT_SECRET: ${{ secrets.CA_CLIENT_SECRET }}
-      BUSINESS_GROUP_ID: ${{ vars.BUSINESS_GROUP_ID }}
-      MULE_VERSION: ${{ vars.MULEVERSION }}
-      CLOUDHUB_ENV: ${{vars.CLOUDHUB_ENV}}
-      CLOUDHUB_REGION: ${{vars.TARGET}}
-      PROVIDER: ${{vars.PROVIDER}}
-      REPLICAS: ${{vars.REPLICAS}}
-      MULE.ENV: ${{ vars.MULE_ENV}}
-    
-    steps:
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: artifact
-            
-      - name: Set up JDK 17 & Maven Cache
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Publish to Exchange
-        run: |
-          muleDeployableJar=$(ls *.jar | head -1)
-
-          mvn deploy \
-          -DskipTests \
-          -s .maven/settings.xml \
-          -Drevision=$APP_VERSION \
-          -Dmule.artifact="$muleDeployableJar"
-
-      - name: Deploy To Development
-        run: |
-          mvn -e -X mule:deploy  -DskipTests -s .maven/settings.xml -Dmule.version=$MULE_VERSION\
-            -Dmule.env=$MULE.ENV\
-            -Drevision=$APP_VERSION \
-            -Danypoint.businessGroupId=$BUSINESS_GROUP_ID \
-            -Dprovider=$PROVIDER\
-            -Dcloudhub.env=$CLOUDHUB_ENV \
-            -Dcloudhub.vcores=0.1\
-            -Dcloudhub.region=$CLOUDHUB_REGION \
-            -Dreplicas=$REPLICAS\
-            -Danypoint.platform.client_id=$CA_CLIENT_ID\
-            -Danypoint.platform.client_secret=$CA_CLIENT_SECRET 
-        # -DconnectedApp_clientId=$CA_CLIENT_ID\
-        # -DconnectedApp_clientSecret=$CA_CLIENT_SECRET
-
+    uses: ./.github/workflows/deploy-env.yml
+    with:
+      environment: DEV
+    secrets: inherit
 
   Deploy_To_QA:
     needs: CI
     if: github.ref == 'refs/heads/qa'
-    runs-on: ubuntu-latest
-    environment: QA
-    steps:
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: drop
-
-      - name: Set up JDK 17 & Maven Cache
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Publish to Exchange
-        run: |
-          mvn deploy -DskipTests -s .maven/settings.xml -Dmule.artifact=$artifactName
-
-      - name: Deploy To QA
-        run: |
-          mvn mule:deploy -DskipTests -s .maven/settings.xml -DskipTests -DskipDeploymentVerification="true"
+    uses: ./.github/workflows/deploy-env.yml
+    with:
+      environment: QA
+    secrets: inherit
 
   Deploy_To_UAT:
     needs: CI
     if: github.ref == 'refs/heads/uat'
-    runs-on: ubuntu-latest
-    environment: UAT
-    steps:
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: drop
+    uses: ./.github/workflows/deploy-env.yml
+    with:
+      environment: UAT
+    secrets: inherit
 
-      - name: Set up JDK 17 & Maven Cache
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Publish to Exchange
-        run: |
-          mvn deploy -DskipTests -s .maven/settings.xml -Dmule.artifact=$artifactName
-
-      - name: Deploy To UAT
-        run: |
-          mvn mule:deploy -DskipTests -s .maven/settings.xml -DskipTests -DskipDeploymentVerification="true"
-
+  # PROD gate lives on the Environment: Settings → Environments → PROD
+  # → Required reviewers (+ restrict deployment branches to main).
   Deploy_To_PROD:
     needs: CI
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    environment: PROD
-    steps:
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: drop
-
-      - name: Set up JDK 17 & Maven Cache
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Publish to Exchange
-        run: |
-          mvn deploy -DskipTests -s .maven/settings.xml -Dmule.artifact=$artifactName
-
-      - name: Deploy To PROD
-        run: |
-          mvn mule:deploy -DskipTests -s .maven/settings.xml -DskipTests -DskipDeploymentVerification="true"
+    uses: ./.github/workflows/deploy-env.yml
+    with:
+      environment: PROD
+    secrets: inherit
+  
