@@ -1,0 +1,67 @@
+name: Deploy to CH2.0 sub-pipeline
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'GitHub Environment: DEV | QA | UAT | PROD'
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    timeout-minutes: 30
+    env:
+      ANYPOINT_CA_CLIENT_ID: ${{ secrets.CA_CLIENT_ID }}
+      ANYPOINT_CA_CLIENT_SECRET: ${{ secrets.CA_CLIENT_SECRET }}
+      BUSINESS_GROUP_ID: ${{ vars.BUSINESS_GROUP_ID }}
+      MULE_VERSION: ${{ vars.MULEVERSION }}
+      CLOUDHUB_ENV: ${{vars.CLOUDHUB_ENV}}
+      CLOUDHUB_REGION: ${{vars.TARGET}}
+      PROVIDER: ${{vars.PROVIDER}}
+      REPLICAS: ${{vars.REPLICAS}}
+      MULE.ENV: ${{ vars.MULE_ENV}}
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: artifact
+
+      - name: Set up JDK 17 (with Maven cache)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # Single step: the asset was published to Exchange once in CI under
+      # this run's GAV; this deployment only references it.
+      - name: Deploy To Development
+        run: |
+          mvn mule:deploy  -DskipTests -s .maven/settings.xml -Dmule.version=$MULE_VERSION\
+            -Dmule.env=$MULE.ENV\
+            -Drevision=$APP_VERSION \
+            -Danypoint.businessGroupId=$BUSINESS_GROUP_ID \
+            -Dprovider=$PROVIDER\
+            -Dcloudhub.env=$CLOUDHUB_ENV \
+            -Dcloudhub.vcores=0.1\
+            -Dcloudhub.region=$CLOUDHUB_REGION \
+            -Dreplicas=$REPLICAS\
+            -Danypoint.platform.client_id=$ANYPOINT_CA_CLIENT_ID\
+            -Danypoint.platform.client_secret=$ANYPOINT_CA_CLIENT_SECRET
+
+      # "Last stable build" at a glance: version + commit on the run's
+      # summary page. The Environments view (repo → Deployments) records
+      # the full per-environment history natively via the job's
+      # environment binding.
+      - name: Record deployment summary
+        if: success()
+        run: |
+          {
+            echo "### Deployed to ${{ inputs.environment }}"
+            echo "- **Version (GAV):** $APP_VERSION"
+            echo "- **Commit:** ${{ github.sha }}"
+            echo "- **Run:** ${{ github.run_id }}"
+          } >> "$GITHUB_STEP_SUMMARY"
