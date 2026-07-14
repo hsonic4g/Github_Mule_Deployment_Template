@@ -14,15 +14,16 @@ jobs:
     environment: ${{ inputs.environment }}
     timeout-minutes: 30
     env:
-      ANYPOINT_CA_CLIENT_ID: ${{ secrets.CA_CLIENT_ID }}
-      ANYPOINT_CA_CLIENT_SECRET: ${{ secrets.CA_CLIENT_SECRET }}
+      ANYPOINT_CA_CLIENT_ID: ${{ secrets.ANYPOINT_CA_CLIENT_ID }}
+      ANYPOINT_CA_CLIENT_SECRET: ${{ secrets.ANYPOINT_CA_CLIENT_SECRET }}
       BUSINESS_GROUP_ID: ${{ vars.BUSINESS_GROUP_ID }}
-      MULE_VERSION: ${{ vars.MULEVERSION }}
-      CLOUDHUB_ENV: ${{vars.CLOUDHUB_ENV}}
-      CLOUDHUB_REGION: ${{vars.TARGET}}
+      MULE_RUNTIME_VERSION: ${{ vars.MULE_RUNTIME_VERSION }}
+      CLOUDHUB_ENVIRONMENT: ${{vars.CLOUDHUB_ENVIRONMENT}}
+      CLOUDHUB_REGION: ${{vars.CLOUDHUB_TARGET}}
       PROVIDER: ${{vars.PROVIDER}}
       REPLICAS: ${{vars.REPLICAS}}
-      MULE.ENV: ${{ vars.MULE_ENV}}
+      MULE_ENV: ${{ vars.MULE_ENV}}
+      VCORES: ${{ vars.VCORES }}
       APP_VERSION: '1.0.${{ github.run_number }}'
     steps:
       - name: Download Build Artifacts
@@ -41,15 +42,16 @@ jobs:
       # this run's GAV; this deployment only references it.
       - name: Deploy To Development
         run: |
-          mvn mule:deploy -B -ntp -DskipTests \
+          mvn -X mule:deploy -B -ntp -DskipTests \
             -s .maven/settings.xml \
             -Dmule.artifact=target/app.jar \
             -Drevision=$APP_VERSION \
-            -Dmule.env=$MULE.ENV\
+            -Dmule.env=$MULE_ENV\
             -Danypoint.businessGroupId=$BUSINESS_GROUP_ID \
             -Dprovider=$PROVIDER\
-            -Dcloudhub.env=$CLOUDHUB_ENV \
-            -Dcloudhub.vcores=0.1\
+            -Dcloudhub.env=$CLOUDHUB_ENVIRONMENT \
+            -Dapp.runtime=$MULE_RUNTIME_VERSION \
+            -Dcloudhub.vcores=$VCORES\
             -Dcloudhub.region=$CLOUDHUB_REGION \
             -Dreplicas=$REPLICAS\
             -Danypoint.platform.client_id=$ANYPOINT_CA_CLIENT_ID\
