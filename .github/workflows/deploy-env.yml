@@ -42,7 +42,7 @@ jobs:
       # this run's GAV; this deployment only references it.
       - name: Deploy To Development
         run: |
-          mvn mule:deploy -B -ntp -DskipTests \
+          mvn -X mule:deploy -B -ntp -DskipTests \
             -s .maven/settings.xml \
             -Dmule.artifact=target/app.jar \
             -Drevision=$APP_VERSION \
@@ -50,7 +50,7 @@ jobs:
             -Danypoint.businessGroupId=$BUSINESS_GROUP_ID \
             -Dprovider=$PROVIDER\
             -Dcloudhub.env=$CLOUDHUB_ENVIRONMENT \
-            -Dapp.runtime=${{ vars.MULE_RUNTIME_VERSION }} \
+            -Dapp.runtime=$MULE_RUNTIME_VERSION \
             -Dcloudhub.vcores=$VCORES\
             -Dcloudhub.region=$CLOUDHUB_REGION \
             -Dreplicas=$REPLICAS\
